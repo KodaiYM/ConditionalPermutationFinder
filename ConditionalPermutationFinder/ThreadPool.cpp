@@ -56,7 +56,7 @@ void ThreadPool::thread_proc() {
 			// pull from queue
 			auto fn = std::move(m_tasks.at(m_task_index++));
 
-			lock.unlock(); // abort!
+			lock.unlock();
 
 			// run function outside context
 			fn();
