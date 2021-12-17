@@ -16,6 +16,11 @@
  * …
  * ABCDEFGHIJKLM: 13の倍数
  */
+/* 処理速度メモ
+ * 12進法の場合、
+ *   queue + mutex で100秒
+ *   vector + index で30秒
+ */
 
 #include "ThreadPool.hpp"
 
@@ -34,6 +39,7 @@ std::vector<std::vector<int>> get_conditional_permutations(int N);
 int main() {
 	int N;
 	std::cout << "何進法で計算しますか(数値を入力(2～16)): ", std::cin >> N;
+	// N=16までは動作が保証される。それより上は、正しく動作するかどうかまだ検証していない。
 	if (std::cin.fail() || N < 2 || N > 16) {
 		std::cerr << "数値入力エラーのため終了します。" << std::endl;
 		return EXIT_FAILURE;
