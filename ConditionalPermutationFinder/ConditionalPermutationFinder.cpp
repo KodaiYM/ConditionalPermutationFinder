@@ -15,6 +15,15 @@
  * ABCDEF: 6の倍数
  * …
  * ABCDEFGHIJKLM: 13の倍数
+ *
+ * 答え
+ * [2進法] 1
+ * [4進法] 123, 321
+ * [6進法] 14325, 54321
+ * [8進法] 3254167, 5234761, 5674321
+ * [10進法] 381654729
+ * [12進法] 解なし
+ * [14進法]
  */
 /* 処理速度メモ
  * 12進法の場合、
@@ -28,13 +37,16 @@
 #include <cassert>
 #include <cstdlib>
 #include <execution>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <numeric>
 #include <vector>
 
-std::vector<std::vector<int>> get_conditional_permutations(int N);
+std::vector<std::vector<int>> get_conditional_permutations(
+    int                                          N,
+    std::function<void(const std::vector<int>&)> callback_when_found = nullptr);
 
 int main() {
 	int N;
@@ -45,28 +57,29 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	auto results = get_conditional_permutations(N);
-	for (const auto& result : results) {
+	auto results = get_conditional_permutations(N, [](const auto& result) {
 		for (int digit : result) {
 			if (0 <= digit && digit < 10) {
 				std::cout << digit;
 			} else {
 				assert(digit >= 10);
 				// Assuming ascii-compatible character encoding
-				std::cout << ('a' + (digit - 10));
+				std::cout << ('A' + (digit - 10));
 			}
 		}
 		std::cout << '\n';
-	}
+	});
 
-	std::cout << "正常に計算終了しました。" << std::endl;
+	std::cout << "正常に計算終了しました。\n"
+	          << results.size() << "件見つかりました。" << std::endl;
 
 	return EXIT_SUCCESS;
 }
 
 static bool satisfy_condition(const std::vector<int>& permutation);
 
-std::vector<std::vector<int>> get_conditional_permutations(int N) {
+std::vector<std::vector<int>> get_conditional_permutations(
+    int N, std::function<void(const std::vector<int>&)> callback_when_found) {
 	std::vector<std::vector<int>> results;
 
 	std::vector<int> permutation(N - 1);
@@ -78,10 +91,11 @@ std::vector<std::vector<int>> get_conditional_permutations(int N) {
 		std::mutex results_push_mtx;
 		do {
 			condition_check_threads.enqueue(
-			    [permutation, &results, &results_push_mtx]() {
+			    [permutation, &results, &results_push_mtx, &callback_when_found]() {
 				    if (satisfy_condition(permutation)) {
 					    std::lock_guard lk(results_push_mtx);
 					    results.push_back(permutation);
+					    callback_when_found(results.back());
 				    }
 			    });
 		} while (std::next_permutation(permutation.begin(), permutation.end()));
