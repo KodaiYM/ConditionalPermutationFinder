@@ -23,7 +23,7 @@
  * [8進法] 3254167, 5234761, 5674321
  * [10進法] 381654729
  * [12進法] 解なし
- * [14進法]
+ * [14進法] 9C3A5476B812D
  */
 /* 処理速度メモ
  * 12進法の場合、
@@ -64,7 +64,7 @@ int main() {
 			} else {
 				assert(digit >= 10);
 				// Assuming ascii-compatible character encoding
-				std::cout << ('A' + (digit - 10));
+				std::cout << (char)('A' + (digit - 10));
 			}
 		}
 		std::cout << '\n';
